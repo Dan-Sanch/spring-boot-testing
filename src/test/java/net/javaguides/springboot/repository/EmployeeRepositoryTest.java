@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 public class EmployeeRepositoryTest {
@@ -117,5 +118,47 @@ public class EmployeeRepositoryTest {
         assertThat(updatedEmployee).isNotNull();
         assertThat(updatedEmployee.getId()).isEqualTo(employee1.getId());
         assertThat(updatedEmployee.getFirstName()).isEqualTo("NewDan");
+    }
+
+    @DisplayName("Delete Employee")
+    @Test
+    public void givenEmployeeObject_whenDeleteEmployee_thenRemoveEmployee() {
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee1);
+
+        // when - action or the behavior that we are going to test
+        employeeRepository.delete(employee1);
+        Optional<Employee> employeeOptional = employeeRepository.findById(employee1.getId());
+
+        // then - verify the output
+        // Note: these two statements are equivalent
+        assertThat(employeeOptional.isPresent()).isFalse();
+        assertThat(employeeOptional).isEmpty();
+    }
+
+    @DisplayName("Delete Employee by ID")
+    @Test
+    public void givenEmployeeObject_whenDeleteEmployeeById_thenRemoveEmployee() {
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee1);
+
+        // when - action or the behavior that we are going to test
+        employeeRepository.deleteById(employee1.getId());
+        Optional<Employee> employeeOptional = employeeRepository.findById(employee1.getId());
+
+        // then - verify the output
+        // Note: these two statements are equivalent
+        assertThat(employeeOptional.isPresent()).isFalse();
+        assertThat(employeeOptional).isEmpty();
     }
 }
