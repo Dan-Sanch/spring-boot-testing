@@ -77,4 +77,23 @@ public class EmployeeRepositoryTest {
         assertThat(foundEmployee).isNotNull();
         assertThat(foundEmployee).isEqualTo(employee1);
     }
+
+    @DisplayName("Get employee by email")
+    @Test
+    public void givenEmployeeEmail_whenFindByEmail_thenReturnEmployeeObject() {
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee1);
+
+        // when - action or the behavior that we are going to test
+        Employee foundEmployee = employeeRepository.findByEmail(employee1.getEmail()).get();
+
+        // then - verify the output
+        assertThat(foundEmployee).isNotNull();
+        assertThat(foundEmployee).isEqualTo(employee1);
+    }
 }
