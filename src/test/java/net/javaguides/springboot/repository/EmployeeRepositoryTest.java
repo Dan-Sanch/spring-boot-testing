@@ -161,4 +161,24 @@ public class EmployeeRepositoryTest {
         assertThat(employeeOptional.isPresent()).isFalse();
         assertThat(employeeOptional).isEmpty();
     }
+
+    @DisplayName("Get Employee by custom JPQL query")
+    @Test
+    public void givenEmployeeObject_whenFindByJpql_thenReturnEmployee() {
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee1);
+
+        // when - action or the behavior that we are going to test
+        Employee returnEmployee = employeeRepository.findByJpql("Dan", "Sanchez");
+
+        // then - verify the output
+        // Note: these two statements are equivalent
+        assertThat(returnEmployee).isNotNull();
+        assertThat(returnEmployee).isEqualTo(employee1);
+    }
 }
