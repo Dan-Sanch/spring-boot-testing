@@ -204,7 +204,7 @@ public class EmployeeRepositoryTest {
 
     @DisplayName("Get Employee by custom SQL query with indexed parameters")
     @Test
-    public void givenEmployeeObject_whenFindBySqlNamedParams_thenReturnEmployee() {
+    public void givenEmployeeObject_whenFindBySqlIndexedParams_thenReturnEmployee() {
         // given - precondition or setup
         Employee employee1 = Employee.builder()
                 .firstName("Dan")
@@ -215,6 +215,26 @@ public class EmployeeRepositoryTest {
 
         // when - action or the behavior that we are going to test
         Employee returnEmployee = employeeRepository.findByNativeSql("Dan", "Sanchez");
+
+        // then - verify the output
+        // Note: these two statements are equivalent
+        assertThat(returnEmployee).isNotNull();
+        assertThat(returnEmployee).isEqualTo(employee1);
+    }
+
+    @DisplayName("Get Employee by custom SQL query with named parameters")
+    @Test
+    public void givenEmployeeObject_whenFindBySqlNamedParams_thenReturnEmployee() {
+        // given - precondition or setup
+        Employee employee1 = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee1);
+
+        // when - action or the behavior that we are going to test
+        Employee returnEmployee = employeeRepository.findByNativeSqlNamedParams("Dan", "Sanchez");
 
         // then - verify the output
         // Note: these two statements are equivalent
