@@ -7,24 +7,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.BDDMockito.given;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
+//@SpringBootTest // NOTE: this annotation would also work, as it also has the @ExtendWith annotation
+@ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTests {
 
+    @Mock
     private EmployeeRepository employeeRepository;
-    private EmployeeService employeeService;
+    @InjectMocks
+    private EmployeeServiceImpl employeeService;
+
+    private Employee employee;
 
     @BeforeEach
-    public void setup() {
-        employeeRepository = Mockito.mock(EmployeeRepository.class);
-        employeeService = new EmployeeServiceImpl(employeeRepository);
-    }
-
-    private Employee buildBaseEmployee() {
-        return Employee.builder()
+    private void buildBaseEmployee() {
+        employee = Employee.builder()
+                .id(1L)
                 .firstName("Dan")
                 .lastName("Sanchez")
                 .email("dan@domain.com")
@@ -35,18 +41,14 @@ public class EmployeeServiceTests {
     @DisplayName("saveEmployee test")
     public void givenEmployeeObject_whenSaveEmployee_thenReturnEmployee() {
         // Given
-        Employee employee = buildBaseEmployee();
         // Method stubbing:
-        BDDMockito
-                .given( // establish the method call to mock, with the given arguments
-                    employeeRepository.findByEmail(employee.getEmail()))
-                .willReturn( // what the mocked method will return
-                        Optional.empty())
+        given( // establish the method call to mock, with the given arguments
+            employeeRepository.findByEmail(employee.getEmail()))
+        .willReturn( // what the mocked method will return
+                Optional.empty())
         ;
-        BDDMockito
-                .given(employeeRepository.save(employee))
-                .willReturn(employee)
-                // Note: the returned employee doesn't get assigned an ID
+        given(employeeRepository.save(employee))
+        .willReturn(employee) // Note: mocked "save" method doesn't generate an ID
         ;
 
         // When
