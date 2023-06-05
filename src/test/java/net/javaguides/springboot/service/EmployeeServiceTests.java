@@ -14,15 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.*;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -166,5 +164,20 @@ public class EmployeeServiceTests {
         assertThat(updatedEmployee.getId()).isEqualTo(employee.getId());
         assertThat(updatedEmployee.getFirstName()).isEqualTo(employee.getFirstName());
         assertThat(updatedEmployee.getLastName()).isEqualTo(employee.getLastName());
+    }
+
+    @Test
+    @DisplayName("deleteEmployee test")
+    public void givenEmployee_whenDeleteEmployee_thenNothing() {
+        // Given
+        long employeeId = employee.getId();
+        // Method stubbing:
+        willDoNothing()
+                .given(employeeRepository).deleteById(employeeId)
+        ;
+        // When
+        employeeService.deleteEmployee(employeeId);
+        // Then
+        verify(employeeRepository, times(1)).deleteById(employeeId);
     }
 }
