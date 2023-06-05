@@ -22,6 +22,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 //@SpringBootTest // NOTE: this annotation would also work, as it also has the @ExtendWith annotation
@@ -82,5 +84,29 @@ public class EmployeeServiceTests {
 
         // Then
         verify(employeeRepository, never()).save(any(Employee.class));
+    }
+
+    @Test
+    @DisplayName("getAllEmployees test")
+    public void givenEmployeesList_whenGetAllEmployees_thenReturnEmployeeList() {
+        // Given
+        Employee employee2 = Employee.builder()
+                .id(2L)
+                .firstName("Tony")
+                .lastName("Stark")
+                .email("tony@domain.com")
+                .build();
+        // Method stubbing:
+        given(employeeRepository.findAll())
+                .willReturn(List.of(employee, employee2))
+        ;
+
+        // When
+        List<Employee> employeeList = employeeService.getAllEmployees();
+
+        // Then
+        assertThat(employeeList).isNotNull();
+        assertThat(employeeList.size()).isEqualTo(2);
+        assertThat(employeeList).contains(employee, employee2);
     }
 }
