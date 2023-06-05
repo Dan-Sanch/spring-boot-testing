@@ -145,4 +145,26 @@ public class EmployeeServiceTests {
         assertThat(optionalEmployee).isPresent();
         assertThat(optionalEmployee.get().getId()).isEqualTo(employee.getId());
     }
+
+    @Test
+    @DisplayName("updateEmployee test")
+    public void givenEmployee_whenUpdateEmployee_thenReturnUpdatedEmployee() {
+        // Given
+        // Method stubbing:
+        given(employeeRepository.save(employee))
+                .willReturn(employee)
+        ;
+        employee.setFirstName("DanUpdate");
+        employee.setLastName("SanchezUpdate");
+
+
+        // When
+        Employee updatedEmployee = employeeService.updateEmployee(employee);
+
+        // Then
+        assertThat(updatedEmployee).isNotNull();
+        assertThat(updatedEmployee.getId()).isEqualTo(employee.getId());
+        assertThat(updatedEmployee.getFirstName()).isEqualTo(employee.getFirstName());
+        assertThat(updatedEmployee.getLastName()).isEqualTo(employee.getLastName());
+    }
 }
