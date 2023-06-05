@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,5 +109,22 @@ public class EmployeeServiceTests {
         assertThat(employeeList).isNotNull();
         assertThat(employeeList.size()).isEqualTo(2);
         assertThat(employeeList).contains(employee, employee2);
+    }
+
+    @Test
+    @DisplayName("getAllEmployees empty list test")
+    public void givenEmptyEmployeesList_whenGetAllEmployees_thenReturnEmptyEmployeeList() {
+        // Given
+        // Method stubbing:
+        given(employeeRepository.findAll())
+                .willReturn(Collections.emptyList())
+        ;
+
+        // When
+        List<Employee> employeeList = employeeService.getAllEmployees();
+
+        // Then
+        assertThat(employeeList).isNotNull();
+        assertThat(employeeList).isEmpty();
     }
 }
