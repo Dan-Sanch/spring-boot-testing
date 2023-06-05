@@ -127,4 +127,22 @@ public class EmployeeServiceTests {
         assertThat(employeeList).isNotNull();
         assertThat(employeeList).isEmpty();
     }
+
+    @Test
+    @DisplayName("getEmployee by ID test")
+    public void givenEmployee_whenGetEmployeeById_thenReturnEmployee() {
+        // Given
+        // Method stubbing:
+        given(employeeRepository.findById(employee.getId()))
+                .willReturn(Optional.of(employee));
+        ;
+
+        // When
+        Optional<Employee> optionalEmployee = employeeService.getEmployeeById(employee.getId());
+
+        // Then
+        assertThat(optionalEmployee).isNotNull();
+        assertThat(optionalEmployee).isPresent();
+        assertThat(optionalEmployee.get().getId()).isEqualTo(employee.getId());
+    }
 }
