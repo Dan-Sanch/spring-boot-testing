@@ -141,4 +141,73 @@ public class EmployeeControllerTests {
                 .andDo(print())
         ;
     }
+
+    @Test
+    @DisplayName("Update employee")
+    public void givenUpdatedEmployeeObject_whenUpdateEmployee_thenReturnEmployee() throws Exception {
+        // Given
+        Employee savedEmployee = employee;
+        long employeeId = savedEmployee.getId();
+
+        given(employeeService.getEmployeeById(employeeId))
+                .willReturn(Optional.of(savedEmployee));
+
+        Employee updatedEmployee = Employee.builder()
+                .id(1L)
+                .firstName("DanUpdate")
+                .lastName("SanchezUpdate")
+                .email("dan_update@domain.com")
+                .build();
+
+        given(employeeService.updateEmployee(ArgumentMatchers.any()))
+                .willAnswer((invocation) -> invocation.getArgument(0));
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                put("/api/employees/{id}", employeeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedEmployee))
+        );
+
+        // Then
+        response
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName",
+                        CoreMatchers.is(updatedEmployee.getFirstName())))
+                .andExpect(jsonPath("$.lastName",
+                        CoreMatchers.is(updatedEmployee.getLastName())))
+                .andExpect(jsonPath("$.email",
+                        CoreMatchers.is(updatedEmployee.getEmail())))
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @DisplayName("Update invalid employee")
+    public void givenBadEmployeeId_whenUpdateEmployee_thenReturnNotFound() throws Exception {
+        // Given
+        long employeeId = 2L;
+        Employee updatedEmployee = Employee.builder()
+                .id(employeeId)
+                .firstName("DanUpdate")
+                .lastName("SanchezUpdate")
+                .email("dan_update@domain.com")
+                .build();
+
+        given(employeeService.getEmployeeById(employeeId))
+                .willReturn(Optional.empty());
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                put("/api/employees/{id}", employeeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedEmployee))
+        );
+
+        // Then
+        response
+                .andExpect(status().isNotFound())
+                .andDo(print())
+        ;
+    }
 }

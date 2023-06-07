@@ -40,4 +40,17 @@ public class EmployeeController {
 //                .orElse(ResponseEntity.notFound().build())        // method orElse() gets passed a value, which is evaluated every time
                 ;
     }
+
+    @PutMapping("{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable("id") long employeeId,
+                                                   @RequestBody Employee employeeObject) {
+        return employeeService.getEmployeeById(employeeId)
+                .map(savedEmployee -> {
+                    // NOTE: the update below would overwrite every provided field to the DB record, including fields
+                    // we wouldn't want to overwrite (like the ID). Ideally, we should check for that.
+                    Employee updatedEmployee = employeeService.updateEmployee(employeeObject);
+                    return ResponseEntity.ok(updatedEmployee);
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
