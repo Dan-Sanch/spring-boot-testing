@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -93,6 +94,50 @@ public class EmployeeControllerTests {
                 .andExpect(status().isOk())   // Test response status
                 .andExpect(jsonPath("$.size()", // Test response data size
                         CoreMatchers.is(2)))
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @DisplayName("GET employee by ID")
+    public void givenEmployeeId_whenGetEmployeeById_thenReturnEmployee() throws Exception {
+        // Given
+        given(employeeService.getEmployeeById(employee.getId()))
+                .willReturn(Optional.of(employee));
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                get("/api/employees/{id}", employee.getId())
+        );
+
+        // Then
+        response
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName",
+                        CoreMatchers.is(employee.getFirstName())))
+                .andExpect(jsonPath("$.lastName",
+                        CoreMatchers.is(employee.getLastName())))
+                .andExpect(jsonPath("$.email",
+                        CoreMatchers.is(employee.getEmail())))
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @DisplayName("GET invalid employee")
+    public void givenBadEmployeeId_whenGetEmployeeById_thenReturnNotFound() throws Exception {
+        // Given
+        given(employeeService.getEmployeeById(2L))
+                .willReturn(Optional.empty());
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                get("/api/employees/{id}", 2L)
+        );
+
+        // Then
+        response
+                .andExpect(status().isNotFound())
                 .andDo(print())
         ;
     }
