@@ -210,4 +210,24 @@ public class EmployeeControllerTests {
                 .andDo(print())
         ;
     }
+
+    @Test
+    @DisplayName("Delete employee")
+    public void givenEmployeeObject_whenDeleteEmployee_thenReturnOk() throws Exception {
+        // Given
+        long employeeId = employee.getId();
+        willDoNothing()
+                .given(employeeService).deleteEmployee(employeeId);
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                delete("/api/employees/{id}", employeeId)
+        );
+
+        // Then
+        response
+                .andExpect(status().isOk())
+                .andDo(print())
+        ;
+    }
 }
