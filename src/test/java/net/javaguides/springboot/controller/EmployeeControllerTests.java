@@ -1,6 +1,5 @@
 package net.javaguides.springboot.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.service.EmployeeService;
@@ -14,13 +13,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.mockito.BDDMockito.given;
+import java.util.List;
+
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest
 public class EmployeeControllerTests {
@@ -50,22 +51,49 @@ public class EmployeeControllerTests {
                 .willAnswer((invocation) -> invocation.getArgument(0));
 
         // When
-        ResultActions response = mockMvc.perform( // throws exception
+        ResultActions response = mockMvc.perform( // <-- throws exception
             MockMvcRequestBuilders.post("/api/employees")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(employee)) // throws exception
+                    .content(objectMapper.writeValueAsString(employee)) // <-- throws exception
         );
 
         // Then
         response
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName",
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.firstName",
                         CoreMatchers.is(employee.getFirstName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName",
+                .andExpect(jsonPath("$.lastName",
                         CoreMatchers.is(employee.getLastName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email",
+                .andExpect(jsonPath("$.email",
                         CoreMatchers.is(employee.getEmail())))
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @DisplayName("GET all employees test")
+    public void givenListOfEmployees_whenGetAllEmployees_thenReturnAllEmployees() throws Exception {
+        // Given
+        Employee employee2 = Employee.builder()
+                .id(2L)
+                .firstName("Dan2")
+                .lastName("Sanchez2")
+                .email("dan2@domain.com")
+                .build();
+        given(employeeService.getAllEmployees())
+                .willReturn(List.of(employee, employee2));
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                get("/api/employees")
+        );
+
+        // Then
+        response
+                .andExpect(status().isOk())   // Test response status
+                .andExpect(jsonPath("$.size()", // Test response data size
+                        CoreMatchers.is(2)))
+                .andDo(print())
         ;
     }
 }
