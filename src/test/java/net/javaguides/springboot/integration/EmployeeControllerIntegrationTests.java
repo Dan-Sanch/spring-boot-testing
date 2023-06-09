@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -130,6 +130,71 @@ public class EmployeeControllerIntegrationTests {
         // When
         ResultActions response = mockMvc.perform(
                 get("/api/employees/{id}", invalidID)
+        );
+
+        // Then
+        response
+                .andExpect(status().isNotFound())
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @DisplayName("Update employee")
+    public void givenUpdatedEmployeeObject_whenUpdateEmployee_thenReturnEmployee() throws Exception {
+        // Given
+        Employee employee = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee);
+        long employeeId = employee.getId();
+
+        Employee updatedEmployee = Employee.builder()
+                .id(employeeId)
+                .firstName("DanUpdate")
+                .lastName("SanchezUpdate")
+                .email("dan_update@domain.com")
+                .build();
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                put("/api/employees/{id}", employeeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedEmployee))
+        );
+
+        // Then
+        response
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName",
+                        CoreMatchers.is(updatedEmployee.getFirstName())))
+                .andExpect(jsonPath("$.lastName",
+                        CoreMatchers.is(updatedEmployee.getLastName())))
+                .andExpect(jsonPath("$.email",
+                        CoreMatchers.is(updatedEmployee.getEmail())))
+                .andDo(print())
+        ;
+    }
+
+    @Test
+    @DisplayName("Update invalid employee")
+    public void givenBadEmployeeId_whenUpdateEmployee_thenReturnNotFound() throws Exception {
+        // Given
+        long invalidEmployeeId = 0L;
+        Employee updatedEmployee = Employee.builder()
+                .id(invalidEmployeeId)
+                .firstName("DanUpdate")
+                .lastName("SanchezUpdate")
+                .email("dan_update@domain.com")
+                .build();
+
+        // When
+        ResultActions response = mockMvc.perform(
+                put("/api/employees/{id}", invalidEmployeeId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedEmployee))
         );
 
         // Then
