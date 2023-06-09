@@ -204,6 +204,30 @@ public class EmployeeControllerIntegrationTests {
         ;
     }
 
+    @Test
+    @DisplayName("Delete employee")
+    public void givenEmployeeObject_whenDeleteEmployee_thenReturnOk() throws Exception {
+        // Given
+        Employee employee = Employee.builder()
+                .firstName("Dan")
+                .lastName("Sanchez")
+                .email("dan@domain.com")
+                .build();
+        employeeRepository.save(employee);
+        long employeeId = employee.getId();
+
+        // When
+        ResultActions response = mockMvc.perform( // <-- throws exception
+                delete("/api/employees/{id}", employeeId)
+        );
+
+        // Then
+        response
+                .andExpect(status().isOk())
+                .andDo(print())
+        ;
+    }
+
     private ResultActions postCreateEmployee(Employee employee) throws Exception {
         return mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/employees")
