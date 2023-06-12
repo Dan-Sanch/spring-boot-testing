@@ -11,14 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -27,29 +22,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@Testcontainers
-public class EmployeeControllerIntegrationTestsTestcontainers {
+public class EmployeeControllerIntegrationTestsTestcontainers extends BaseTestAbstraction {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private EmployeeRepository employeeRepository;
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Container
-    private static MySQLContainer mySqlContainer = new MySQLContainer<>("mysql:latest")
-            .withUsername("username")
-            .withPassword("password")
-            .withDatabaseName("ems");
-
-    @DynamicPropertySource
-    public static void dynamicPropertySource(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mySqlContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mySqlContainer::getUsername);
-        registry.add("spring.datasource.password", mySqlContainer::getPassword);
-        // NOTE: this also works, but the value provided is resolved immediately instead of being a callback method
-//        System.setProperty("spring.datasource.url", mySqlContainer.getJdbcUrl());
-    }
 
     @BeforeEach
     void setup() {
